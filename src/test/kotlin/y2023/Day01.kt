@@ -2,6 +2,7 @@ package y2023
 
 import util.getInputAsLines
 import util.parseExampleInput
+import java.util.Locale
 import kotlin.test.Test
 import kotlin.test.assertEquals
 
@@ -32,9 +33,9 @@ private fun task2(inputLines: List<String>) =
             },
     )
 
-val input = getInputAsLines("2023", "day01")
-
 class Day01 {
+    private val input = getInputAsLines("2023", this::class.simpleName!!.lowercase(Locale.getDefault()))
+
     @Test
     fun testTask1ExampleInput() {
         val expected = 142
