@@ -9,7 +9,7 @@ import kotlin.test.assertEquals
 private fun task1(inputLines: List<String>) =
     inputLines
         .sumOf { card ->
-            val numbers = card.substringAfter(": ").trim().replace("\\s+".toRegex(), " ").split(" | ")
+            val numbers = parseNumbersFromCard(card)
             val (winningNumbers, scratchedNumbers) = pairOfNumbers(numbers)
 
             var points = 0
@@ -25,7 +25,34 @@ private fun task1(inputLines: List<String>) =
             points
         }
 
-private fun task2(inputLines: List<String>) = 1
+private fun task2(inputLines: List<String>) =
+    inputLines
+        .sumOf {
+            score(inputLines, it)
+        }
+
+private fun score(inputLines: List<String>, card: String): Int {
+    val cardNumber = "[0-9]+".toRegex().find(card)?.value?.toInt() ?: throw Error()
+    val numbers = parseNumbersFromCard(card)
+    val (winningNumbers, scratchedNumbers) = pairOfNumbers(numbers)
+
+    var matches = 0
+    winningNumbers.forEach { winningNumber ->
+        if (scratchedNumbers.contains(winningNumber)) {
+            matches++
+        }
+    }
+
+    var score = 1
+
+    for (match in 1..matches) {
+        score += score(inputLines, inputLines[cardNumber - 1 + match])
+    }
+
+    return score
+}
+
+private fun parseNumbersFromCard(card: String) = card.substringAfter(": ").trim().replace("\\s+".toRegex(), " ").split(" | ")
 
 private fun pairOfNumbers(numbers: List<String>) =
     parseNumbers(numbers.first()) to parseNumbers(numbers.last())
@@ -57,7 +84,7 @@ class Day04 {
 
     @Test
     fun testTask2ActualInput() {
-        val expected = 0
+        val expected = 5744979
         assertEquals(expected, task2(input))
     }
 }
