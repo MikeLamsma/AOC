@@ -41,28 +41,51 @@ private fun task2(input: List<String>): Long {
         nodes[it.substringBefore(" =")] = node
     }
 
-    var steps = 0L
-    val instructions = input.first()
-    var currentInstructionsIndex = 0
-    var currentNodes = nodes.filter { it.key.endsWith("A") }.toList()
-    while (!currentNodes.all { it.first.endsWith("Z") }) {
-        if (currentInstructionsIndex == instructions.length) {
-            currentInstructionsIndex = 0
-        }
-        when (instructions[currentInstructionsIndex]) {
-            'L' -> currentNodes = currentNodes.map {
-                val next = nodes[it.first]!!.left; next to nodes[next]!!
+    return nodes.filter { it.key.endsWith("A") }.toList().map {
+        var steps = 0L
+        val instructions = input.first()
+        var currentInstructionsIndex = 0
+        var current = it
+        while (!current.first.endsWith('Z')) {
+            if (currentInstructionsIndex == instructions.length) {
+                currentInstructionsIndex = 0
             }
+            when (instructions[currentInstructionsIndex]) {
+                'L' -> {
+                    val next = nodes[current.first]!!.left; current = next to nodes[next]!!
+                }
 
-            'R' -> currentNodes = currentNodes.map {
-                val next = nodes[it.first]!!.right; next to nodes[next]!!
+                'R' -> {
+                    val next = nodes[current.first]!!.right; current = next to nodes[next]!!
+                }
             }
+            currentInstructionsIndex++
+            steps++
         }
-        currentInstructionsIndex++
-        steps++
+        steps
+    }.findLCMOfListOfNumbers()
+}
+
+// Kindly borrowed from https://www.baeldung.com/kotlin/lcm
+fun findLCM(a: Long, b: Long): Long {
+    val larger = if (a > b) a else b
+    val maxLcm = a * b
+    var lcm = larger
+    while (lcm <= maxLcm) {
+        if (lcm % a == 0L && lcm % b == 0L) {
+            return lcm
+        }
+        lcm += larger
     }
+    return maxLcm
+}
 
-    return steps
+fun List<Long>.findLCMOfListOfNumbers(): Long {
+    var result = this[0]
+    for (i in 1..<this.size) {
+        result = findLCM(result, this[i])
+    }
+    return result
 }
 
 class Day08 {
@@ -90,7 +113,7 @@ class Day08 {
 
     @Test
     fun testTask2ActualInput() {
-        val expected = 0L
+        val expected = 18024643846273L
         assertEquals(expected, task2(input))
     }
 }
